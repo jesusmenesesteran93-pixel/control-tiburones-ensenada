@@ -1,0 +1,165 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#102d49">
+<title>Tiburones Ensenada</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f1f5f9;color:#172536;font-family:Arial,sans-serif}
+header{background:linear-gradient(135deg,#102d49,#17618d);color:white;padding:25px 18px;border-radius:0 0 22px 22px}
+header h1{margin:0;font-size:25px}header p{color:#bce6ff;margin-bottom:0}
+main{padding:15px;max-width:650px;margin:auto}
+nav{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:15px}
+button{border:0;border-radius:11px;padding:12px 7px;font-weight:bold;background:#e2edf6;color:#123653}
+nav button{font-size:12px}
+nav button.active,.primary{background:#123653;color:white}
+section{display:none;background:white;border-radius:15px;padding:16px;margin-bottom:13px}
+section.active{display:block}
+h2{font-size:19px;color:#123653;margin-top:0}
+input,select,textarea{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:9px;margin:6px 0 12px;background:white}
+.primary{width:100%;margin-top:8px}
+.item{padding:12px 0;border-bottom:1px solid #e5eaf0;display:flex;align-items:center;gap:9px}
+.item span{flex:1}
+.item small{display:block;color:#64748b;margin-top:3px}
+.item button{padding:8px;background:#fee2e2;color:#991b1b}
+.stat{background:#e8f5ff;padding:15px;border-radius:12px;margin-bottom:10px}
+.stat b{font-size:27px;color:#123653;display:block}
+.winner{background:#123653;color:white;padding:20px;text-align:center;border-radius:15px}
+.winner h2{color:#9cddff}.winner strong{font-size:28px;color:#9cddff}
+label{font-size:14px;font-weight:bold}
+.check{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #eee}
+.check input{width:20px;margin:0}
+.check span{flex:1}
+small,.muted{color:#64748b}
+</style>
+</head>
+<body>
+<header>
+<h1>🦈 TIBURONES ENSENADA</h1>
+<p>CONTROL DEPORTIVO · PANEL DEL COACH</p>
+</header>
+<main>
+<nav>
+<button class="active" onclick="tab('inicio',this)">🏠 Inicio</button>
+<button onclick="tab('alumnos',this)">👥 Alumnos</button>
+<button onclick="tab('asistencia',this)">📋 Lista</button>
+<button onclick="tab('evaluar',this)">⭐ Evaluar</button>
+</nav>
+
+<section id="inicio" class="active">
+<h2>Panel del Coach</h2>
+<div class="stat"><b id="cantidad">0</b>Alumnos registrados</div>
+<div class="stat"><b id="asistieron">0</b>Asistencias registradas</div>
+<h2>🏆 MVP DEL MES</h2>
+<label>Seleccionar mes</label>
+<input type="month" id="mes" onchange="actualizar()">
+<div class="winner" id="ganador">🏀<h2>¡A trabajar por el MVP!</h2>Registra asistencias y evaluaciones.</div>
+<p class="muted">Asistencia 40% · Esfuerzo 15% · Disciplina 10% · Actitud 10% · Equipo 10% · Participación 5% · Mejora 10%.</p>
+</section>
+
+<section id="alumnos">
+<h2>Registrar alumno</h2>
+<label>Nombre completo</label>
+<input id="nombre" placeholder="Nombre del jugador">
+<label>Categoría</label>
+<select id="categoria">
+<option>Inicial (6–7 años)</option>
+<option>Infantil (8–10 años)</option>
+<option>Juvenil (11–17 años)</option>
+</select>
+<button class="primary" onclick="agregar()">AGREGAR ALUMNO</button>
+<h2 style="margin-top:22px">Mis alumnos</h2>
+<div id="listaAlumnos"></div>
+</section>
+
+<section id="asistencia">
+<h2>Control de asistencia</h2>
+<label>Fecha</label><input type="date" id="fecha">
+<label>Horario</label>
+<select id="horario">
+<option>4:30–5:30 · Inicial</option>
+<option>5:30–6:30 · Infantil</option>
+<option>6:30–7:30 · Juvenil</option>
+</select>
+<p class="muted">Marca a los alumnos presentes.</p>
+<div id="listaAsistencia"></div>
+<button class="primary" onclick="guardarAsistencia()">GUARDAR ASISTENCIA</button>
+</section>
+
+<section id="evaluar">
+<h2>Evaluación del jugador</h2>
+<label>Alumno</label><select id="jugador"></select>
+<label>Fecha</label><input type="date" id="fechaEval">
+<div id="criterios"></div>
+<label>Observaciones</label>
+<textarea id="notas" placeholder="Comentarios del entrenamiento"></textarea>
+<button class="primary" onclick="guardarEval()">GUARDAR EVALUACIÓN</button>
+<h2 style="margin-top:22px">Últimas evaluaciones</h2>
+<div id="historial"></div>
+</section>
+
+<section>
+<h2>Respaldo de información</h2>
+<p class="muted">Descarga una copia de tus registros para conservarlos si cambias de teléfono.</p>
+<button class="primary" onclick="respaldo()">DESCARGAR RESPALDO</button>
+<label>Restaurar respaldo</label>
+<input type="file" id="archivo" accept=".json">
+<button class="primary" onclick="restaurar()">RESTAURAR DATOS</button>
+</section>
+</main>
+<script>
+const clave='tiburonesDatos';
+let datos=JSON.parse(localStorage.getItem(clave)||'{"alumnos":[],"asistencias":[],"evaluaciones":[]}');
+const criterios=[['esfuerzo','Esfuerzo',15],['disciplina','Disciplina',10],['actitud','Actitud',10],['equipo','Trabajo en equipo',10],['participacion','Participación',5],['mejora','Mejora individual',10]];
+const hoy=()=>new Date().toISOString().slice(0,10);
+fecha.value=hoy();fechaEval.value=hoy();mes.value=hoy().slice(0,7);
+function guardar(){localStorage.setItem(clave,JSON.stringify(datos));actualizar()}
+function tab(id,b){document.querySelectorAll('main>section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');actualizar()}
+function agregar(){let n=nombre.value.trim();if(!n)return alert('Escribe el nombre');datos.alumnos.push({id:Date.now(),nombre:n,categoria:categoria.value});nombre.value='';guardar()}
+function borrar(id){if(confirm('¿Eliminar alumno y sus registros?')){datos.alumnos=datos.alumnos.filter(a=>a.id!=id);datos.asistencias=datos.asistencias.filter(a=>a.id!=id);datos.evaluaciones=datos.evaluaciones.filter(a=>a.id!=id);guardar()}}
+function actualizar(){
+cantidad.textContent=datos.alumnos.length;
+asistieron.textContent=datos.asistencias.filter(a=>a.presente).length;
+listaAlumnos.innerHTML=datos.alumnos.map(a=>`<div class="item"><span><b>${a.nombre}</b><small>${a.categoria}</small></span><button onclick="borrar(${a.id})">Eliminar</button></div>`).join('')||'<p class="muted">Todavía no hay alumnos.</p>';
+listaAsistencia.innerHTML=datos.alumnos.map(a=>`<label class="check"><input type="checkbox" value="${a.id}"><span>${a.nombre}</span></label>`).join('')||'<p>Primero registra alumnos.</p>';
+jugador.innerHTML=datos.alumnos.map(a=>`<option value="${a.id}">${a.nombre}</option>`).join('');
+criteriosDiv();
+historial.innerHTML=datos.evaluaciones.slice(-5).reverse().map(e=>{let a=datos.alumnos.find(x=>x.id==e.id);return a?`<div class="item"><span>${a.nombre}<small>${e.fecha}</small></span></div>`:''}).join('')||'<p class="muted">Sin evaluaciones.</p>';
+calcular();
+}
+function criteriosDiv(){criteriosBox.innerHTML=criterios.map(c=>`<label>${c[1]} (1 a 5)</label><select id="${c[0]}"><option value="5">5 - Excelente</option><option value="4">4 - Muy bien</option><option value="3" selected>3 - Bien</option><option value="2">2 - Por mejorar</option><option value="1">1 - Necesita apoyo</option></select>`).join('')}
+const criteriosBox=document.getElementById('criterios');
+function guardarAsistencia(){
+if(!datos.alumnos.length)return alert('Registra alumnos primero');
+let f=fecha.value,h=horario.value;
+let ids=[...document.querySelectorAll('#listaAsistencia input:checked')].map(x=>Number(x.value));
+datos.asistencias=datos.asistencias.filter(a=>!(a.fecha===f&&a.horario===h));
+datos.alumnos.forEach(a=>datos.asistencias.push({id:a.id,fecha:f,horario:h,presente:ids.includes(a.id)}));
+guardar();alert('Asistencia guardada');
+}
+function guardarEval(){
+let id=Number(jugador.value);if(!id)return alert('Registra alumnos primero');
+let puntuacion={};criterios.forEach(c=>puntuacion[c[0]]=Number(document.getElementById(c[0]).value));
+datos.evaluaciones.push({id,fecha:fechaEval.value,puntuacion,notas:notas.value});
+notas.value='';guardar();alert('Evaluación guardada');
+}
+function calcular(){
+let m=mes.value,ranking=datos.alumnos.map(a=>{
+let as=datos.asistencias.filter(x=>x.id==a.id&&x.fecha.startsWith(m));
+let asistencia=as.length?as.filter(x=>x.presente).length/as.length*100:0;
+let ev=datos.evaluaciones.filter(x=>x.id==a.id&&x.fecha.startsWith(m));
+let promedio=0;
+if(ev.length){promedio=ev.reduce((s,e)=>s+criterios.reduce((v,c)=>v+(e.puntuacion[c[0]]/5)*c[2],0),0)/ev.length/60*100}
+return {nombre:a.nombre,asistencia,puntos:asistencia*.4+(ev.length?promedio*.6:0),evaluaciones:ev.length};
+}).filter(x=>x.asistencia>0||x.evaluaciones).sort((a,b)=>b.puntos-a.puntos);
+ganador.innerHTML=ranking.length?`🏆<h2>${ranking[0].nombre}</h2><strong>${ranking[0].puntos.toFixed(1)} puntos</strong><p>Asistencia: ${ranking[0].asistencia.toFixed(0)}%</p><hr>${ranking.map((x,i)=>`<p>${i+1}. ${x.nombre} — ${x.puntos.toFixed(1)}</p>`).join('')}`:'🏀<h2>¡A trabajar por el MVP!</h2>Registra asistencias y evaluaciones.';
+}
+function respaldo(){let b=new Blob([JSON.stringify(datos)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='respaldo-tiburones.json';a.click()}
+function restaurar(){let f=archivo.files[0];if(!f)return alert('Selecciona un respaldo');let r=new FileReader();r.onload=()=>{try{datos=JSON.parse(r.result);guardar();alert('Respaldo restaurado')}catch(e){alert('Archivo no válido')}};r.readAsText(f)}
+actualizar();
+</script>
+</body>
+</html>
