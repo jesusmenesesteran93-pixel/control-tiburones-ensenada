@@ -3,37 +3,35 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#102d49">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Tiburones Ensenada</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#f1f5f9;color:#172536;font-family:Arial,sans-serif}
+body{margin:0;background:#f0f4fa;color:#172f46;font-family:Arial,sans-serif}
 header{background:linear-gradient(135deg,#102d49,#17618d);color:white;padding:25px 18px;border-radius:0 0 22px 22px}
-header h1{margin:0;font-size:25px}header p{color:#bce6ff;margin-bottom:0}
-main{padding:15px;max-width:650px;margin:auto}
-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:15px}
-button{border:0;border-radius:11px;padding:12px 7px;font-weight:bold;background:#e2edf6;color:#123653}
-nav button{font-size:12px}
-nav button.active,.primary{background:#123653;color:white}
-section{display:none;background:white;border-radius:15px;padding:16px;margin-bottom:13px}
-section.active{display:block}
-h2{font-size:19px;color:#123653;margin-top:0}
-input,select,textarea{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:9px;margin:6px 0 12px;background:white}
-.primary{width:100%;margin-top:8px}
-.item{padding:12px 0;border-bottom:1px solid #e5eaf0;display:flex;align-items:center;gap:9px}
-.item span{flex:1}
-.item small{display:block;color:#64748b;margin-top:3px}
-.item button{padding:8px;background:#fee2e2;color:#991b1b}
-.stat{background:#e8f5ff;padding:15px;border-radius:12px;margin-bottom:10px}
-.stat b{font-size:27px;color:#123653;display:block}
-.winner{background:#123653;color:white;padding:20px;text-align:center;border-radius:15px}
-.winner h2{color:#9cddff}.winner strong{font-size:28px;color:#9cddff}
-label{font-size:14px;font-weight:bold}
-.check{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #eee}
-.check input{width:20px;margin:0}
-.check span{flex:1}
-small,.muted{color:#64748b}
+header h1{margin:0;font-size:25px}
+header p{color:#bce6ff;margin-bottom:0}
+main{padding:15px;max-width:700px;margin:auto}
+nav{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:16px}
+button{border:0;border-radius:12px;padding:13px 9px;font-weight:bold;background:#e2edf6;color:#123653;font-size:14px}
+button.active,.primary{background:#153b59;color:white}
+.card{background:white;border-radius:22px;padding:20px;margin-bottom:16px}
+h2{font-size:23px;margin-top:0}
+h3{margin-bottom:8px}
+label{display:block;font-weight:bold;margin:14px 0 7px}
+input,select,textarea{width:100%;padding:14px;border:1px solid #cbd5df;border-radius:12px;font-size:16px;background:white}
+textarea{min-height:75px}
+.primary{width:100%;padding:16px;margin-top:15px;font-size:16px}
+.item{padding:13px 0;border-bottom:1px solid #ddd}
+.tags,.scores{display:flex;flex-wrap:wrap;gap:7px}
+.tag,.score{padding:11px 13px;border-radius:10px;background:#e8f0f7;color:#173b59}
+.tag.selected,.score.selected{background:#17466a;color:white}
+.score{flex:1;text-align:center;font-size:18px}
+.muted{color:#718092}
+.result{background:#153b59;color:#bce6ff;padding:20px;border-radius:18px;text-align:center;margin-top:12px}
+.result strong{font-size:27px;display:block;margin:8px}
+.hidden{display:none}
+.small{font-size:13px}
 </style>
 </head>
 <body>
@@ -43,123 +41,205 @@ small,.muted{color:#64748b}
 </header>
 <main>
 <nav>
-<button class="active" onclick="tab('inicio',this)">🏠 Inicio</button>
-<button onclick="tab('alumnos',this)">👥 Alumnos</button>
-<button onclick="tab('asistencia',this)">📋 Lista</button>
-<button onclick="tab('evaluar',this)">⭐ Evaluar</button>
+<button class="active" onclick="show('inicio',this)">🏠 Inicio</button>
+<button onclick="show('alumnos',this)">👥 Alumnos</button>
+<button onclick="show('registro',this)">📋 Entrenamiento</button>
+<button onclick="show('evaluar',this)">⭐ Evaluar</button>
+<button onclick="show('historial',this)">📅 Historial</button>
+<button onclick="show('ranking',this)">🏆 MVP</button>
 </nav>
 
-<section id="inicio" class="active">
+<section id="inicio" class="card">
 <h2>Panel del Coach</h2>
-<div class="stat"><b id="cantidad">0</b>Alumnos registrados</div>
-<div class="stat"><b id="asistieron">0</b>Asistencias registradas</div>
-<h2>🏆 MVP DEL MES</h2>
-<label>Seleccionar mes</label>
-<input type="month" id="mes" onchange="actualizar()">
-<div class="winner" id="ganador">🏀<h2>¡A trabajar por el MVP!</h2>Registra asistencias y evaluaciones.</div>
-<p class="muted">Asistencia 40% · Esfuerzo 15% · Disciplina 10% · Actitud 10% · Equipo 10% · Participación 5% · Mejora 10%.</p>
+<div class="result">
+<strong id="totalAlumnos">0</strong>Alumnos registrados
+<strong id="totalRegistros">0</strong>Entrenamientos registrados
+</div>
+<h3>🏆 Seguimiento mensual</h3>
+<p class="muted">Registra cada entrenamiento y consulta cómo van tus jugadores durante el mes.</p>
+<button class="primary" onclick="show('ranking')">VER RANKING ACTUAL</button>
 </section>
 
-<section id="alumnos">
+<section id="alumnos" class="card hidden">
 <h2>Registrar alumno</h2>
 <label>Nombre completo</label>
 <input id="nombre" placeholder="Nombre del jugador">
-<label>Categoría</label>
+<label>Categoría y horario</label>
 <select id="categoria">
-<option>Inicial (6–7 años)</option>
-<option>Infantil (8–10 años)</option>
-<option>Juvenil (11–17 años)</option>
+<option>Inicial · 4:30 a 5:30</option>
+<option>Infantil · 5:30 a 6:30</option>
+<option>Juvenil · 6:30 a 7:30</option>
 </select>
-<button class="primary" onclick="agregar()">AGREGAR ALUMNO</button>
-<h2 style="margin-top:22px">Mis alumnos</h2>
+<button class="primary" onclick="addStudent()">AGREGAR ALUMNO</button>
+<h3>Mis alumnos</h3>
 <div id="listaAlumnos"></div>
 </section>
 
-<section id="asistencia">
-<h2>Control de asistencia</h2>
-<label>Fecha</label><input type="date" id="fecha">
+<section id="registro" class="card hidden">
+<h2>📋 Entrenamiento del día</h2>
+<label>Fecha</label>
+<input type="date" id="fechaEntreno">
 <label>Horario</label>
 <select id="horario">
-<option>4:30–5:30 · Inicial</option>
-<option>5:30–6:30 · Infantil</option>
-<option>6:30–7:30 · Juvenil</option>
+<option>Inicial · 4:30 a 5:30</option>
+<option>Infantil · 5:30 a 6:30</option>
+<option>Juvenil · 6:30 a 7:30</option>
 </select>
-<p class="muted">Marca a los alumnos presentes.</p>
-<div id="listaAsistencia"></div>
-<button class="primary" onclick="guardarAsistencia()">GUARDAR ASISTENCIA</button>
+<p class="muted">Marca quién asistió. Después selecciona las observaciones de cada jugador.</p>
+<div id="listaEntreno"></div>
+<button class="primary" onclick="saveTraining()">GUARDAR ENTRENAMIENTO</button>
 </section>
 
-<section id="evaluar">
-<h2>Evaluación del jugador</h2>
-<label>Alumno</label><select id="jugador"></select>
-<label>Fecha</label><input type="date" id="fechaEval">
+<section id="evaluar" class="card hidden">
+<h2>⭐ Evaluación del jugador</h2>
+<label>Jugador</label>
+<select id="evalAlumno"></select>
+<label>Fecha</label>
+<input type="date" id="fechaEval">
 <div id="criterios"></div>
-<label>Observaciones</label>
-<textarea id="notas" placeholder="Comentarios del entrenamiento"></textarea>
-<button class="primary" onclick="guardarEval()">GUARDAR EVALUACIÓN</button>
-<h2 style="margin-top:22px">Últimas evaluaciones</h2>
-<div id="historial"></div>
+<label>Observaciones adicionales</label>
+<textarea id="comentario" placeholder="Comentarios del entrenamiento"></textarea>
+<button class="primary" onclick="saveEvaluation()">GUARDAR EVALUACIÓN</button>
 </section>
 
-<section>
-<h2>Respaldo de información</h2>
-<p class="muted">Descarga una copia de tus registros para conservarlos si cambias de teléfono.</p>
-<button class="primary" onclick="respaldo()">DESCARGAR RESPALDO</button>
-<label>Restaurar respaldo</label>
-<input type="file" id="archivo" accept=".json">
-<button class="primary" onclick="restaurar()">RESTAURAR DATOS</button>
+<section id="historial" class="card hidden">
+<h2>📅 Historial del jugador</h2>
+<label>Seleccionar jugador</label>
+<select id="histAlumno" onchange="renderHistory()"></select>
+<div id="histContenido"></div>
+</section>
+
+<section id="ranking" class="card hidden">
+<h2>🏆 Ranking mensual MVP</h2>
+<label>Seleccionar mes</label>
+<input type="month" id="mesRanking" onchange="renderRanking()">
+<div id="rankingContenido"></div>
+<button class="primary" onclick="closeMonth()">CERRAR MES Y ELEGIR MVP</button>
+<p class="muted small">El cierre es manual. Se elegirán máximo dos jugadores de toda la academia.</p>
+<div id="cierre"></div>
 </section>
 </main>
+
 <script>
-const clave='tiburonesDatos';
-let datos=JSON.parse(localStorage.getItem(clave)||'{"alumnos":[],"asistencias":[],"evaluaciones":[]}');
-const criterios=[['esfuerzo','Esfuerzo',15],['disciplina','Disciplina',10],['actitud','Actitud',10],['equipo','Trabajo en equipo',10],['participacion','Participación',5],['mejora','Mejora individual',10]];
-const hoy=()=>new Date().toISOString().slice(0,10);
-fecha.value=hoy();fechaEval.value=hoy();mes.value=hoy().slice(0,7);
-function guardar(){localStorage.setItem(clave,JSON.stringify(datos));actualizar()}
-function tab(id,b){document.querySelectorAll('main>section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');actualizar()}
-function agregar(){let n=nombre.value.trim();if(!n)return alert('Escribe el nombre');datos.alumnos.push({id:Date.now(),nombre:n,categoria:categoria.value});nombre.value='';guardar()}
-function borrar(id){if(confirm('¿Eliminar alumno y sus registros?')){datos.alumnos=datos.alumnos.filter(a=>a.id!=id);datos.asistencias=datos.asistencias.filter(a=>a.id!=id);datos.evaluaciones=datos.evaluaciones.filter(a=>a.id!=id);guardar()}}
-function actualizar(){
-cantidad.textContent=datos.alumnos.length;
-asistieron.textContent=datos.asistencias.filter(a=>a.presente).length;
-listaAlumnos.innerHTML=datos.alumnos.map(a=>`<div class="item"><span><b>${a.nombre}</b><small>${a.categoria}</small></span><button onclick="borrar(${a.id})">Eliminar</button></div>`).join('')||'<p class="muted">Todavía no hay alumnos.</p>';
-listaAsistencia.innerHTML=datos.alumnos.map(a=>`<label class="check"><input type="checkbox" value="${a.id}"><span>${a.nombre}</span></label>`).join('')||'<p>Primero registra alumnos.</p>';
-jugador.innerHTML=datos.alumnos.map(a=>`<option value="${a.id}">${a.nombre}</option>`).join('');
-criteriosDiv();
-historial.innerHTML=datos.evaluaciones.slice(-5).reverse().map(e=>{let a=datos.alumnos.find(x=>x.id==e.id);return a?`<div class="item"><span>${a.nombre}<small>${e.fecha}</small></span></div>`:''}).join('')||'<p class="muted">Sin evaluaciones.</p>';
-calcular();
+const KEY='tiburones_academia_v2';
+let db=JSON.parse(localStorage.getItem(KEY)||'{"students":[],"trainings":[],"evaluations":[],"closures":[]}');
+const criteria=['Esfuerzo','Disciplina','Actitud','Trabajo en equipo','Participación','Mejora individual'];
+const observations=['😊 Excelente actitud','🙌 Muy participativo','🤝 Ayudó al equipo','💬 Estuvo platicador','👀 Se distrajo','⚠️ No sigue indicaciones'];
+const positive=observations.slice(0,3);
+const negative=observations.slice(3);
+function save(){localStorage.setItem(KEY,JSON.stringify(db));refresh()}
+function show(id,btn){
+document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));
+document.getElementById(id).classList.remove('hidden');
+document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+if(btn)btn.classList.add('active');
+if(id==='registro')renderTraining();
+if(id==='evaluar')renderCriteria();
+if(id==='historial')renderHistory();
+if(id==='ranking')renderRanking();
 }
-function criteriosDiv(){criteriosBox.innerHTML=criterios.map(c=>`<label>${c[1]} (1 a 5)</label><select id="${c[0]}"><option value="5">5 - Excelente</option><option value="4">4 - Muy bien</option><option value="3" selected>3 - Bien</option><option value="2">2 - Por mejorar</option><option value="1">1 - Necesita apoyo</option></select>`).join('')}
-const criteriosBox=document.getElementById('criterios');
-function guardarAsistencia(){
-if(!datos.alumnos.length)return alert('Registra alumnos primero');
-let f=fecha.value,h=horario.value;
-let ids=[...document.querySelectorAll('#listaAsistencia input:checked')].map(x=>Number(x.value));
-datos.asistencias=datos.asistencias.filter(a=>!(a.fecha===f&&a.horario===h));
-datos.alumnos.forEach(a=>datos.asistencias.push({id:a.id,fecha:f,horario:h,presente:ids.includes(a.id)}));
-guardar();alert('Asistencia guardada');
+function today(){return new Date().toISOString().slice(0,10)}
+function addStudent(){
+let name=document.getElementById('nombre').value.trim();
+if(!name)return alert('Escribe el nombre del alumno');
+db.students.push({id:Date.now(),name,category:document.getElementById('categoria').value});
+document.getElementById('nombre').value='';
+save();alert('Alumno agregado');
 }
-function guardarEval(){
-let id=Number(jugador.value);if(!id)return alert('Registra alumnos primero');
-let puntuacion={};criterios.forEach(c=>puntuacion[c[0]]=Number(document.getElementById(c[0]).value));
-datos.evaluaciones.push({id,fecha:fechaEval.value,puntuacion,notas:notas.value});
-notas.value='';guardar();alert('Evaluación guardada');
+function refresh(){
+document.getElementById('totalAlumnos').textContent=db.students.length;
+document.getElementById('totalRegistros').textContent=db.trainings.length;
+document.getElementById('listaAlumnos').innerHTML=db.students.map(s=>`<div class="item"><b>${esc(s.name)}</b><br><span class="muted">${esc(s.category)}</span></div>`).join('')||'<p class="muted">Todavía no hay alumnos.</p>';
+['evalAlumno','histAlumno'].forEach(id=>{
+let el=document.getElementById(id),old=el.value;
+el.innerHTML=db.students.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
+if(old)el.value=old;
+});
 }
-function calcular(){
-let m=mes.value,ranking=datos.alumnos.map(a=>{
-let as=datos.asistencias.filter(x=>x.id==a.id&&x.fecha.startsWith(m));
-let asistencia=as.length?as.filter(x=>x.presente).length/as.length*100:0;
-let ev=datos.evaluaciones.filter(x=>x.id==a.id&&x.fecha.startsWith(m));
-let promedio=0;
-if(ev.length){promedio=ev.reduce((s,e)=>s+criterios.reduce((v,c)=>v+(e.puntuacion[c[0]]/5)*c[2],0),0)/ev.length/60*100}
-return {nombre:a.nombre,asistencia,puntos:asistencia*.4+(ev.length?promedio*.6:0),evaluaciones:ev.length};
-}).filter(x=>x.asistencia>0||x.evaluaciones).sort((a,b)=>b.puntos-a.puntos);
-ganador.innerHTML=ranking.length?`🏆<h2>${ranking[0].nombre}</h2><strong>${ranking[0].puntos.toFixed(1)} puntos</strong><p>Asistencia: ${ranking[0].asistencia.toFixed(0)}%</p><hr>${ranking.map((x,i)=>`<p>${i+1}. ${x.nombre} — ${x.puntos.toFixed(1)}</p>`).join('')}`:'🏀<h2>¡A trabajar por el MVP!</h2>Registra asistencias y evaluaciones.';
+function renderTraining(){
+document.getElementById('fechaEntreno').value ||=today();
+let cat=document.getElementById('horario').value;
+let students=db.students.filter(s=>s.category===cat);
+document.getElementById('listaEntreno').innerHTML=students.map(s=>`
+<div class="item" data-student="${s.id}">
+<b>${esc(s.name)}</b>
+<label><input type="checkbox" class="present" style="width:auto"> Asistió</label>
+<div class="tags">${observations.map(o=>`<button type="button" class="tag" onclick="this.classList.toggle('selected')">${o}</button>`).join('')}</div>
+</div>`).join('')||'<p class="muted">No hay alumnos en este horario.</p>';
 }
-function respaldo(){let b=new Blob([JSON.stringify(datos)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='respaldo-tiburones.json';a.click()}
-function restaurar(){let f=archivo.files[0];if(!f)return alert('Selecciona un respaldo');let r=new FileReader();r.onload=()=>{try{datos=JSON.parse(r.result);guardar();alert('Respaldo restaurado')}catch(e){alert('Archivo no válido')}};r.readAsText(f)}
-actualizar();
+document.getElementById('horario').addEventListener('change',renderTraining);
+function saveTraining(){
+let date=document.getElementById('fechaEntreno').value,cat=document.getElementById('horario').value;
+if(!date)return alert('Selecciona una fecha');
+let rows=[...document.querySelectorAll('[data-student]')];
+if(!rows.length)return alert('No hay alumnos en este horario');
+rows.forEach(row=>{
+let id=Number(row.dataset.student);
+db.trainings.push({id:Date.now()+id+Math.random(),student:id,date,category:cat,present:row.querySelector('.present').checked,observations:[...row.querySelectorAll('.tag.selected')].map(b=>b.textContent)});
+});
+save();alert('Entrenamiento guardado');
+}
+function renderCriteria(){
+document.getElementById('fechaEval').value ||=today();
+document.getElementById('criterios').innerHTML=criteria.map((c,i)=>`
+<div class="item"><b>${c}</b><div class="scores" data-criterion="${i}">
+${[1,2,3,4,5].map(n=>`<button type="button" class="score ${n===3?'selected':''}" onclick="pick(this)">${n}</button>`).join('')}
+</div></div>`).join('');
+}
+function pick(btn){[...btn.parentElement.children].forEach(b=>b.classList.remove('selected'));btn.classList.add('selected')}
+function saveEvaluation(){
+let student=Number(document.getElementById('evalAlumno').value);
+if(!student)return alert('Primero registra un alumno');
+let values=[...document.querySelectorAll('[data-criterion]')].map(x=>Number(x.querySelector('.selected')?.textContent||3));
+db.evaluations.push({student,date:document.getElementById('fechaEval').value||today(),values,comment:document.getElementById('comentario').value});
+document.getElementById('comentario').value='';
+save();alert('Evaluación guardada');
+}
+function month(){return document.getElementById('mesRanking').value||today().slice(0,7)}
+function score(s,m){
+let sessions=db.trainings.filter(t=>t.student===s.id&&t.date.startsWith(m));
+let present=sessions.filter(t=>t.present).length;
+let attendance=sessions.length?present/sessions.length*100:0;
+let ev=db.evaluations.filter(e=>e.student===s.id&&e.date.startsWith(m));
+let avg=ev.length?ev.reduce((a,e)=>a+e.values.reduce((x,y)=>x+y,0)/6,0)/ev.length:3;
+let base=attendance*.4+(avg/5*100)*.6;
+let obs=sessions.flatMap(t=>t.observations);
+let bonus=obs.filter(o=>positive.includes(o)).length*1.5;
+let penalty=obs.filter(o=>negative.includes(o)).length*2;
+return {total:Math.max(0,Math.min(100,base+bonus-penalty)),attendance,sessions,ev,obs};
+}
+function renderRanking(){
+document.getElementById('mesRanking').value ||=today().slice(0,7);
+let m=month();
+let rows=db.students.map(s=>({s,...score(s,m)})).sort((a,b)=>b.total-a.total);
+document.getElementById('rankingContenido').innerHTML=rows.map((r,i)=>`
+<div class="item"><b>${i+1}. ${esc(r.s.name)}</b><br>${esc(r.s.category)}
+<strong style="float:right">${r.total.toFixed(1)} pts</strong>
+<br><span class="muted small">Asistencia ${r.attendance.toFixed(0)}% · ${r.sessions.length} entrenamientos · ${r.obs.length} observaciones</span></div>`).join('')||'<p class="muted">Registra alumnos para ver el ranking.</p>';
+}
+function closeMonth(){
+let m=month(),rows=db.students.map(s=>({s,...score(s,m)})).filter(r=>r.sessions.length||r.ev.length).sort((a,b)=>b.total-a.total).slice(0,2);
+if(!rows.length)return alert('No hay registros para cerrar este mes');
+if(!confirm('¿Confirmas el cierre de '+m+' y guardar estos ganadores?'))return;
+db.closures.push({month:m,date:today(),winners:rows.map(r=>({name:r.s.name,category:r.s.category,score:r.total}))});
+save();
+document.getElementById('cierre').innerHTML='<h3>🏆 Ganadores del mes</h3>'+rows.map((r,i)=>`<p><b>${i+1}. ${esc(r.s.name)}</b> · ${r.total.toFixed(1)} puntos</p>`).join('');
+}
+function renderHistory(){
+let id=Number(document.getElementById('histAlumno').value);
+let s=db.students.find(x=>x.id===id);
+if(!s){document.getElementById('histContenido').innerHTML='';return}
+let ts=db.trainings.filter(t=>t.student===id).sort((a,b)=>b.date.localeCompare(a.date));
+let es=db.evaluations.filter(e=>e.student===id).sort((a,b)=>b.date.localeCompare(a.date));
+document.getElementById('histContenido').innerHTML='<h3>'+esc(s.name)+'</h3><h3>Entrenamientos</h3>'+
+(ts.map(t=>`<div class="item"><b>${t.date}</b> · ${t.present?'Asistió':'Faltó'}<br>${t.observations.map(esc).join(' · ')}</div>`).join('')||'<p>Sin entrenamientos.</p>')+
+'<h3>Evaluaciones</h3>'+(es.map(e=>`<div class="item"><b>${e.date}</b><br>${criteria.map((c,i)=>c+': '+e.values[i]+'/5').join(' · ')}<br>${esc(e.comment||'')}</div>`).join('')||'<p>Sin evaluaciones.</p>');
+}
+function esc(x){return String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+refresh();
+document.getElementById('fechaEntreno').value=today();
+document.getElementById('fechaEval').value=today();
+document.getElementById('mesRanking').value=today().slice(0,7);
 </script>
 </body>
 </html>
