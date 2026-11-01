@@ -1,245 +1,571 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Tiburones Ensenada</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#071426">
+<title>Control de Academia | Tiburones Ensenada</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#f0f4fa;color:#172f46;font-family:Arial,sans-serif}
-header{background:linear-gradient(135deg,#102d49,#17618d);color:white;padding:25px 18px;border-radius:0 0 22px 22px}
-header h1{margin:0;font-size:25px}
-header p{color:#bce6ff;margin-bottom:0}
-main{padding:15px;max-width:700px;margin:auto}
-nav{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:16px}
-button{border:0;border-radius:12px;padding:13px 9px;font-weight:bold;background:#e2edf6;color:#123653;font-size:14px}
-button.active,.primary{background:#153b59;color:white}
-.card{background:white;border-radius:22px;padding:20px;margin-bottom:16px}
-h2{font-size:23px;margin-top:0}
-h3{margin-bottom:8px}
-label{display:block;font-weight:bold;margin:14px 0 7px}
-input,select,textarea{width:100%;padding:14px;border:1px solid #cbd5df;border-radius:12px;font-size:16px;background:white}
-textarea{min-height:75px}
-.primary{width:100%;padding:16px;margin-top:15px;font-size:16px}
-.item{padding:13px 0;border-bottom:1px solid #ddd}
-.tags,.scores{display:flex;flex-wrap:wrap;gap:7px}
-.tag,.score{padding:11px 13px;border-radius:10px;background:#e8f0f7;color:#173b59}
-.tag.selected,.score.selected{background:#17466a;color:white}
-.score{flex:1;text-align:center;font-size:18px}
-.muted{color:#718092}
-.result{background:#153b59;color:#bce6ff;padding:20px;border-radius:18px;text-align:center;margin-top:12px}
-.result strong{font-size:27px;display:block;margin:8px}
-.hidden{display:none}
-.small{font-size:13px}
+:root {
+  --bg:#071426; --panel:#10243d; --panel2:#183553;
+  --text:#fff; --muted:#a9bdd2; --blue:#168bff;
+  --green:#13c9a5; --purple:#9865ff; --gold:#ffbd35;
+  --pink:#ed55b5; --red:#ef5350;
+}
+* {box-sizing:border-box}
+body {
+  margin:0; background:radial-gradient(circle at top,#183b60,var(--bg) 60%);
+  color:var(--text); font-family:Arial,sans-serif; min-height:100vh;
+}
+button,input,select,textarea {font:inherit}
+button {cursor:pointer}
+.container {width:min(100% - 26px,900px);margin:auto;padding:20px 0 45px}
+header {text-align:center;padding:15px 5px 22px}
+.logo {
+  width:105px;height:105px;border-radius:25px;
+  display:grid;place-items:center;margin:auto auto 12px;
+  background:linear-gradient(145deg,#168bff,#06366c);
+  font-size:52px;overflow:hidden;
+}
+.logo img {width:100%;height:100%;object-fit:contain}
+h1 {font-size:clamp(22px,5vw,32px);margin:4px 0;letter-spacing:1px}
+.subtitle {font-size:12px;color:var(--muted);letter-spacing:3px}
+.panel {
+  background:rgba(16,36,61,.96);border:1px solid #29445f;
+  border-radius:18px;padding:19px;margin-bottom:16px;
+  box-shadow:0 10px 30px #0003;
+}
+.login {max-width:430px;margin:10px auto}
+h2 {font-size:20px;margin:4px 0 16px}
+label {display:block;color:var(--muted);font-size:13px;margin:13px 0 6px}
+input,select,textarea {
+  width:100%;padding:13px;border:1px solid #34516f;
+  border-radius:11px;background:#091a2e;color:white;outline:none;
+}
+textarea {min-height:75px;resize:vertical}
+input:focus,select:focus,textarea:focus {border-color:var(--blue)}
+.btn {
+  border:0;border-radius:11px;padding:13px 16px;
+  color:white;font-weight:bold;background:var(--blue);
+}
+.btn:disabled {opacity:.5}
+.btn.full {width:100%;margin-top:18px}
+.btn.gray {background:#344b65}
+.btn.green {background:#087f70}
+.btn.red {background:#a93636}
+.message {font-size:13px;color:#ffd27b;margin-top:12px;line-height:1.5}
+.userbar {display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.welcome {font-size:20px;font-weight:bold}
+.role {font-size:12px;color:var(--muted);margin-top:5px}
+.section-title {font-size:17px;margin:23px 0 13px}
+.modules {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.module {
+  min-height:125px;border:1px solid #ffffff20;border-radius:17px;
+  padding:16px;color:white;text-align:left;
+}
+.module span {display:block;font-size:29px;margin-bottom:12px}
+.module strong {font-size:14px}
+.module small {display:block;color:#ffffffbd;margin-top:6px;line-height:1.4}
+.blue {background:linear-gradient(135deg,#0878e9,#06417f)}
+.green {background:linear-gradient(135deg,#08ae91,#075c65)}
+.purple {background:linear-gradient(135deg,#8950e9,#482c91)}
+.gold {background:linear-gradient(135deg,#d99a18,#80500b)}
+.pink {background:linear-gradient(135deg,#dc48a6,#812c82);grid-column:1/-1}
+.view {display:none}
+.view.active {display:block}
+.back {background:#344b65;margin-bottom:16px}
+.row {display:flex;gap:9px;flex-wrap:wrap}
+.row > * {flex:1}
+.item {
+  background:#0a1b30;border:1px solid #294663;
+  border-radius:12px;padding:13px;margin-top:10px;
+}
+.item strong {display:block;margin-bottom:5px}
+.item small {color:var(--muted);line-height:1.5}
+.badge {font-size:11px;border-radius:20px;padding:5px 9px;background:#234463;display:inline-block}
+.notice {background:#0a1b30;border:1px solid #294663;border-radius:12px;padding:14px;color:var(--muted);font-size:13px;line-height:1.5}
+.empty {text-align:center;color:var(--muted);padding:22px 8px}
+.hidden {display:none!important}
+.footer {text-align:center;color:#71869e;font-size:11px;margin-top:25px}
+@media(max-width:380px) {
+  .modules {grid-template-columns:1fr}
+  .pink {grid-column:auto}
+}
 </style>
 </head>
+
 <body>
+<main class="container">
+
 <header>
-<h1>🦈 TIBURONES ENSENADA</h1>
-<p>CONTROL DEPORTIVO · PANEL DEL COACH</p>
+  <div class="logo" id="logo">
+    <span>🦈</span>
+  </div>
+  <h1>CONTROL DE ACADEMIA</h1>
+  <div class="subtitle">TIBURONES ENSENADA</div>
 </header>
-<main>
-<nav>
-<button class="active" onclick="show('inicio',this)">🏠 Inicio</button>
-<button onclick="show('alumnos',this)">👥 Alumnos</button>
-<button onclick="show('registro',this)">📋 Entrenamiento</button>
-<button onclick="show('evaluar',this)">⭐ Evaluar</button>
-<button onclick="show('historial',this)">📅 Historial</button>
-<button onclick="show('ranking',this)">🏆 MVP</button>
-</nav>
 
-<section id="inicio" class="card">
-<h2>Panel del Coach</h2>
-<div class="result">
-<strong id="totalAlumnos">0</strong>Alumnos registrados
-<strong id="totalRegistros">0</strong>Entrenamientos registrados
-</div>
-<h3>🏆 Seguimiento mensual</h3>
-<p class="muted">Registra cada entrenamiento y consulta cómo van tus jugadores durante el mes.</p>
-<button class="primary" onclick="show('ranking')">VER RANKING ACTUAL</button>
+<section id="login" class="panel login">
+  <h2 style="text-align:center">Acceso a la academia</h2>
+  <label>Correo electrónico</label>
+  <input id="email" type="email" autocomplete="username" placeholder="Tu correo">
+  <label>Contraseña</label>
+  <input id="password" type="password" autocomplete="current-password" placeholder="Tu contraseña">
+  <button class="btn full" id="loginBtn" onclick="login()">ENTRAR</button>
+  <div class="message" id="loginMessage"></div>
 </section>
 
-<section id="alumnos" class="card hidden">
-<h2>Registrar alumno</h2>
-<label>Nombre completo</label>
-<input id="nombre" placeholder="Nombre del jugador">
-<label>Categoría y horario</label>
-<select id="categoria">
-<option>Inicial · 4:30 a 5:30</option>
-<option>Infantil · 5:30 a 6:30</option>
-<option>Juvenil · 6:30 a 7:30</option>
-</select>
-<button class="primary" onclick="addStudent()">AGREGAR ALUMNO</button>
-<h3>Mis alumnos</h3>
-<div id="listaAlumnos"></div>
+<section id="app" class="hidden">
+
+  <div class="panel userbar">
+    <div>
+      <div class="welcome" id="welcome">¡Bienvenido!</div>
+      <div class="role" id="role"></div>
+    </div>
+    <button class="btn gray" onclick="logout()">Salir</button>
+  </div>
+
+  <section id="menu">
+    <h2 class="section-title">MENÚ PRINCIPAL</h2>
+    <div class="modules">
+      <button class="module blue" onclick="openView('students')">
+        <span>👥</span><strong>ALUMNOS</strong>
+        <small>Familias, alumnos y grupos</small>
+      </button>
+      <button class="module green" onclick="openView('payments')">
+        <span>💳</span><strong>PAGOS</strong>
+        <small>Mensualidades y pedidos</small>
+      </button>
+      <button class="module purple" onclick="openView('training')">
+        <span>🏀</span><strong>ENTRENAMIENTOS</strong>
+        <small>Asistencia y evaluaciones</small>
+      </button>
+      <button class="module gold" onclick="openView('mvp')">
+        <span>🏆</span><strong>MVP DEL MES</strong>
+        <small>Seguimiento y reconocimientos</small>
+      </button>
+      <button class="module pink" onclick="openView('stats')">
+        <span>📊</span><strong>ESTADÍSTICAS</strong>
+        <small>Ingresos, gastos y resultados</small>
+      </button>
+    </div>
+  </section>
+
+  <section id="view-students" class="panel view">
+    <button class="btn back" onclick="backMenu()">← Regresar</button>
+    <h2>👥 Familias y alumnos</h2>
+
+    <div class="notice">
+      Registra primero la familia y después agrega sus hijos.
+      Cada alumno puede tener una cuota mensual diferente, incluso $0.
+    </div>
+
+    <h3>Nueva familia</h3>
+    <label>Apellido o nombre de familia</label>
+    <input id="familyName" placeholder="Ej. Familia Pérez">
+    <label>Responsable (papá, mamá o tutor)</label>
+    <input id="responsible" placeholder="Nombre del responsable">
+    <label>Teléfono</label>
+    <input id="phone" type="tel" placeholder="Teléfono (opcional)">
+    <button class="btn full" onclick="saveFamily()">GUARDAR FAMILIA</button>
+    <div id="familyMessage" class="message"></div>
+
+    <hr style="border-color:#294663;margin:22px 0">
+
+    <h3>Agregar alumno</h3>
+    <label>Selecciona la familia</label>
+    <select id="studentFamily"><option value="">Primero registra una familia</option></select>
+
+    <label>Nombre completo del alumno</label>
+    <input id="studentName" placeholder="Nombre completo">
+
+    <label>Grupo</label>
+    <select id="studentGroup">
+      <option value="">Seleccionar grupo</option>
+      <option>Inicial</option>
+      <option>Infantil</option>
+      <option>Juvenil</option>
+      <option>Matutino</option>
+      <option>4 a 5 años</option>
+    </select>
+
+    <label>Cuota mensual individual (MXN)</label>
+    <input id="studentFee" type="number" min="0" step="0.01" placeholder="Escribe la cuota acordada">
+
+    <button class="btn full" onclick="saveStudent()">GUARDAR ALUMNO</button>
+    <div id="studentMessage" class="message"></div>
+
+    <h3 style="margin-top:25px">Familias registradas</h3>
+    <div id="familiesList"><div class="empty">Cargando familias...</div></div>
+
+    <h3 style="margin-top:25px">Alumnos registrados</h3>
+    <div id="studentsList"><div class="empty">Cargando alumnos...</div></div>
+  </section>
+
+  <section id="view-payments" class="panel view">
+    <button class="btn back" onclick="backMenu()">← Regresar</button>
+    <h2>💳 Pagos</h2>
+    <div class="notice">
+      Aquí se conectará el registro de mensualidades, abonos, saldos,
+      métodos de pago y pedidos. Los pagos de productos serán independientes
+      de las mensualidades.
+    </div>
+  </section>
+
+  <section id="view-training" class="panel view">
+    <button class="btn back" onclick="backMenu()">← Regresar</button>
+    <h2>🏀 Entrenamientos</h2>
+    <div class="notice">
+      Aquí se conectará el control de sesiones, asistencia, observaciones
+      y evaluaciones. Cada alumno tendrá un solo registro por sesión.
+    </div>
+  </section>
+
+  <section id="view-mvp" class="panel view">
+    <button class="btn back" onclick="backMenu()">← Regresar</button>
+    <h2>🏆 MVP DEL MES</h2>
+    <div class="notice">
+      Aquí se conectará el ranking mensual, las ponderaciones configurables
+      y el cierre de resultados realizado por el Coach.
+    </div>
+  </section>
+
+  <section id="view-stats" class="panel view">
+    <button class="btn back" onclick="backMenu()">← Regresar</button>
+    <h2>📊 Estadísticas</h2>
+    <div class="notice">
+      Aquí se conectará el resumen de ingresos, gastos, mensualidades,
+      ventas y dinero disponible.
+    </div>
+  </section>
+
 </section>
 
-<section id="registro" class="card hidden">
-<h2>📋 Entrenamiento del día</h2>
-<label>Fecha</label>
-<input type="date" id="fechaEntreno">
-<label>Horario</label>
-<select id="horario">
-<option>Inicial · 4:30 a 5:30</option>
-<option>Infantil · 5:30 a 6:30</option>
-<option>Juvenil · 6:30 a 7:30</option>
-</select>
-<p class="muted">Marca quién asistió. Después selecciona las observaciones de cada jugador.</p>
-<div id="listaEntreno"></div>
-<button class="primary" onclick="saveTraining()">GUARDAR ENTRENAMIENTO</button>
-</section>
-
-<section id="evaluar" class="card hidden">
-<h2>⭐ Evaluación del jugador</h2>
-<label>Jugador</label>
-<select id="evalAlumno"></select>
-<label>Fecha</label>
-<input type="date" id="fechaEval">
-<div id="criterios"></div>
-<label>Observaciones adicionales</label>
-<textarea id="comentario" placeholder="Comentarios del entrenamiento"></textarea>
-<button class="primary" onclick="saveEvaluation()">GUARDAR EVALUACIÓN</button>
-</section>
-
-<section id="historial" class="card hidden">
-<h2>📅 Historial del jugador</h2>
-<label>Seleccionar jugador</label>
-<select id="histAlumno" onchange="renderHistory()"></select>
-<div id="histContenido"></div>
-</section>
-
-<section id="ranking" class="card hidden">
-<h2>🏆 Ranking mensual MVP</h2>
-<label>Seleccionar mes</label>
-<input type="month" id="mesRanking" onchange="renderRanking()">
-<div id="rankingContenido"></div>
-<button class="primary" onclick="closeMonth()">CERRAR MES Y ELEGIR MVP</button>
-<p class="muted small">El cierre es manual. Se elegirán máximo dos jugadores de toda la academia.</p>
-<div id="cierre"></div>
-</section>
+<footer class="footer">
+  ACADEMIA TIBURONES ENSENADA · CONTROL ADMINISTRATIVO
+</footer>
 </main>
 
 <script>
-const KEY='tiburones_academia_v2';
-let db=JSON.parse(localStorage.getItem(KEY)||'{"students":[],"trainings":[],"evaluations":[],"closures":[]}');
-const criteria=['Esfuerzo','Disciplina','Actitud','Trabajo en equipo','Participación','Mejora individual'];
-const observations=['😊 Excelente actitud','🙌 Muy participativo','🤝 Ayudó al equipo','💬 Estuvo platicador','👀 Se distrajo','⚠️ No sigue indicaciones'];
-const positive=observations.slice(0,3);
-const negative=observations.slice(3);
-function save(){localStorage.setItem(KEY,JSON.stringify(db));refresh()}
-function show(id,btn){
-document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));
-document.getElementById(id).classList.remove('hidden');
-document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
-if(btn)btn.classList.add('active');
-if(id==='registro')renderTraining();
-if(id==='evaluar')renderCriteria();
-if(id==='historial')renderHistory();
-if(id==='ranking')renderRanking();
+/*
+  CONFIGURACIÓN:
+  Sustituir estos valores por los datos del proyecto Supabase.
+  Nunca introducir una clave service_role en este archivo.
+*/
+const SUPABASE_URL = "AGREGAR_URL_DE_SUPABASE";
+const SUPABASE_ANON_KEY = "AGREGAR_CLAVE_PUBLICA_ANON";
+
+let db = null;
+let currentUser = null;
+let currentProfile = null;
+
+function configureDatabase() {
+  if (!window.supabase ||
+      !SUPABASE_URL.startsWith("https://") ||
+      SUPABASE_ANON_KEY.startsWith("AGREGAR_")) {
+    document.getElementById("loginMessage").textContent =
+      "Falta configurar la conexión segura con Supabase.";
+    return false;
+  }
+  db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  return true;
 }
-function today(){return new Date().toISOString().slice(0,10)}
-function addStudent(){
-let name=document.getElementById('nombre').value.trim();
-if(!name)return alert('Escribe el nombre del alumno');
-db.students.push({id:Date.now(),name,category:document.getElementById('categoria').value});
-document.getElementById('nombre').value='';
-save();alert('Alumno agregado');
+
+async function login() {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const button = document.getElementById("loginBtn");
+
+  if (!email || !password) {
+    document.getElementById("loginMessage").textContent =
+      "Escribe tu correo y contraseña.";
+    return;
+  }
+
+  if (!db && !configureDatabase()) return;
+
+  button.disabled = true;
+  button.textContent = "VERIFICANDO...";
+
+  try {
+    const {data, error} = await db.auth.signInWithPassword({email,password});
+    if (error) throw error;
+
+    currentUser = data.user;
+
+    const {data:profile,error:profileError} = await db
+      .from("profiles")
+      .select("full_name,role,active")
+      .eq("id",currentUser.id)
+      .single();
+
+    if (profileError) throw profileError;
+    if (!profile || !profile.active) throw new Error("Cuenta inactiva.");
+
+    currentProfile = profile;
+    showApp();
+
+  } catch (error) {
+    document.getElementById("loginMessage").textContent =
+      error.message || "No fue posible iniciar sesión.";
+    if (db) await db.auth.signOut();
+  } finally {
+    button.disabled = false;
+    button.textContent = "ENTRAR";
+  }
 }
-function refresh(){
-document.getElementById('totalAlumnos').textContent=db.students.length;
-document.getElementById('totalRegistros').textContent=db.trainings.length;
-document.getElementById('listaAlumnos').innerHTML=db.students.map(s=>`<div class="item"><b>${esc(s.name)}</b><br><span class="muted">${esc(s.category)}</span></div>`).join('')||'<p class="muted">Todavía no hay alumnos.</p>';
-['evalAlumno','histAlumno'].forEach(id=>{
-let el=document.getElementById(id),old=el.value;
-el.innerHTML=db.students.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
-if(old)el.value=old;
-});
+
+function showApp() {
+  document.getElementById("login").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+
+  document.getElementById("welcome").textContent =
+    "¡Bienvenido, " + currentProfile.full_name + "!";
+
+  document.getElementById("role").textContent =
+    currentProfile.role === "ADMIN_GENERAL"
+      ? "Administrador general"
+      : "Administración de pagos";
+
+  const isCoach = currentProfile.role === "ADMIN_GENERAL";
+  document.querySelectorAll(".module.purple,.module.gold").forEach(el => {
+    el.classList.toggle("hidden",!isCoach);
+  });
+
+  loadFamilies();
+  loadStudents();
 }
-function renderTraining(){
-document.getElementById('fechaEntreno').value ||=today();
-let cat=document.getElementById('horario').value;
-let students=db.students.filter(s=>s.category===cat);
-document.getElementById('listaEntreno').innerHTML=students.map(s=>`
-<div class="item" data-student="${s.id}">
-<b>${esc(s.name)}</b>
-<label><input type="checkbox" class="present" style="width:auto"> Asistió</label>
-<div class="tags">${observations.map(o=>`<button type="button" class="tag" onclick="this.classList.toggle('selected')">${o}</button>`).join('')}</div>
-</div>`).join('')||'<p class="muted">No hay alumnos en este horario.</p>';
+
+async function logout() {
+  if (db) await db.auth.signOut();
+  currentUser = null;
+  currentProfile = null;
+  document.getElementById("app").classList.add("hidden");
+  document.getElementById("login").classList.remove("hidden");
+  document.getElementById("password").value = "";
 }
-document.getElementById('horario').addEventListener('change',renderTraining);
-function saveTraining(){
-let date=document.getElementById('fechaEntreno').value,cat=document.getElementById('horario').value;
-if(!date)return alert('Selecciona una fecha');
-let rows=[...document.querySelectorAll('[data-student]')];
-if(!rows.length)return alert('No hay alumnos en este horario');
-rows.forEach(row=>{
-let id=Number(row.dataset.student);
-db.trainings.push({id:Date.now()+id+Math.random(),student:id,date,category:cat,present:row.querySelector('.present').checked,observations:[...row.querySelectorAll('.tag.selected')].map(b=>b.textContent)});
-});
-save();alert('Entrenamiento guardado');
+
+function openView(name) {
+  document.getElementById("menu").classList.add("hidden");
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  document.getElementById("view-" + name).classList.add("active");
 }
-function renderCriteria(){
-document.getElementById('fechaEval').value ||=today();
-document.getElementById('criterios').innerHTML=criteria.map((c,i)=>`
-<div class="item"><b>${c}</b><div class="scores" data-criterion="${i}">
-${[1,2,3,4,5].map(n=>`<button type="button" class="score ${n===3?'selected':''}" onclick="pick(this)">${n}</button>`).join('')}
-</div></div>`).join('');
+
+function backMenu() {
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  document.getElementById("menu").classList.remove("hidden");
 }
-function pick(btn){[...btn.parentElement.children].forEach(b=>b.classList.remove('selected'));btn.classList.add('selected')}
-function saveEvaluation(){
-let student=Number(document.getElementById('evalAlumno').value);
-if(!student)return alert('Primero registra un alumno');
-let values=[...document.querySelectorAll('[data-criterion]')].map(x=>Number(x.querySelector('.selected')?.textContent||3));
-db.evaluations.push({student,date:document.getElementById('fechaEval').value||today(),values,comment:document.getElementById('comentario').value});
-document.getElementById('comentario').value='';
-save();alert('Evaluación guardada');
+
+function setMessage(id,text) {
+  document.getElementById(id).textContent = text;
 }
-function month(){return document.getElementById('mesRanking').value||today().slice(0,7)}
-function score(s,m){
-let sessions=db.trainings.filter(t=>t.student===s.id&&t.date.startsWith(m));
-let present=sessions.filter(t=>t.present).length;
-let attendance=sessions.length?present/sessions.length*100:0;
-let ev=db.evaluations.filter(e=>e.student===s.id&&e.date.startsWith(m));
-let avg=ev.length?ev.reduce((a,e)=>a+e.values.reduce((x,y)=>x+y,0)/6,0)/ev.length:3;
-let base=attendance*.4+(avg/5*100)*.6;
-let obs=sessions.flatMap(t=>t.observations);
-let bonus=obs.filter(o=>positive.includes(o)).length*1.5;
-let penalty=obs.filter(o=>negative.includes(o)).length*2;
-return {total:Math.max(0,Math.min(100,base+bonus-penalty)),attendance,sessions,ev,obs};
+
+async function saveFamily() {
+  if (currentProfile.role !== "ADMIN_GENERAL") {
+    setMessage("familyMessage","Solo el Coach puede registrar familias.");
+    return;
+  }
+
+  const family_name = document.getElementById("familyName").value.trim();
+  const responsible_name = document.getElementById("responsible").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+
+  if (!family_name) {
+    setMessage("familyMessage","Escribe el nombre o apellido de la familia.");
+    return;
+  }
+
+  const {error} = await db.from("families").insert({
+    family_name,responsible_name,phone
+  });
+
+  if (error) {
+    setMessage("familyMessage","Error: " + error.message);
+    return;
+  }
+
+  document.getElementById("familyName").value = "";
+  document.getElementById("responsible").value = "";
+  document.getElementById("phone").value = "";
+  setMessage("familyMessage","Familia registrada correctamente.");
+  await loadFamilies();
 }
-function renderRanking(){
-document.getElementById('mesRanking').value ||=today().slice(0,7);
-let m=month();
-let rows=db.students.map(s=>({s,...score(s,m)})).sort((a,b)=>b.total-a.total);
-document.getElementById('rankingContenido').innerHTML=rows.map((r,i)=>`
-<div class="item"><b>${i+1}. ${esc(r.s.name)}</b><br>${esc(r.s.category)}
-<strong style="float:right">${r.total.toFixed(1)} pts</strong>
-<br><span class="muted small">Asistencia ${r.attendance.toFixed(0)}% · ${r.sessions.length} entrenamientos · ${r.obs.length} observaciones</span></div>`).join('')||'<p class="muted">Registra alumnos para ver el ranking.</p>';
+
+async function loadFamilies() {
+  if (!db) return;
+
+  const list = document.getElementById("familiesList");
+  const select = document.getElementById("studentFamily");
+
+  const {data,error} = await db.from("families")
+    .select("id,family_name,responsible_name,phone")
+    .eq("active",true)
+    .order("family_name");
+
+  if (error) {
+    list.innerHTML = '<div class="empty">No se pudieron cargar las familias.</div>';
+    return;
+  }
+
+  select.innerHTML = '<option value="">Seleccionar familia</option>';
+
+  if (!data.length) {
+    list.innerHTML = '<div class="empty">Todavía no hay familias registradas.</div>';
+    return;
+  }
+
+  data.forEach(f => {
+    const option = document.createElement("option");
+    option.value = f.id;
+    option.textContent = f.family_name;
+    select.appendChild(option);
+  });
+
+  list.replaceChildren();
+
+  data.forEach(f => {
+    const card = document.createElement("div");
+    card.className = "item";
+
+    const title = document.createElement("strong");
+    title.textContent = f.family_name;
+
+    const detail = document.createElement("small");
+    detail.textContent =
+      (f.responsible_name || "Sin responsable registrado") +
+      " · " + (f.phone || "Sin teléfono");
+
+    card.append(title,detail);
+    list.appendChild(card);
+  });
 }
-function closeMonth(){
-let m=month(),rows=db.students.map(s=>({s,...score(s,m)})).filter(r=>r.sessions.length||r.ev.length).sort((a,b)=>b.total-a.total).slice(0,2);
-if(!rows.length)return alert('No hay registros para cerrar este mes');
-if(!confirm('¿Confirmas el cierre de '+m+' y guardar estos ganadores?'))return;
-db.closures.push({month:m,date:today(),winners:rows.map(r=>({name:r.s.name,category:r.s.category,score:r.total}))});
-save();
-document.getElementById('cierre').innerHTML='<h3>🏆 Ganadores del mes</h3>'+rows.map((r,i)=>`<p><b>${i+1}. ${esc(r.s.name)}</b> · ${r.total.toFixed(1)} puntos</p>`).join('');
+
+async function saveStudent() {
+  if (currentProfile.role !== "ADMIN_GENERAL") {
+    setMessage("studentMessage","Solo el Coach puede registrar alumnos.");
+    return;
+  }
+
+  const family_id = document.getElementById("studentFamily").value;
+  const full_name = document.getElementById("studentName").value.trim();
+  const groupName = document.getElementById("studentGroup").value;
+  const feeText = document.getElementById("studentFee").value;
+
+  if (!family_id || !full_name || !groupName || feeText === "") {
+    setMessage("studentMessage","Completa familia, nombre, grupo y cuota.");
+    return;
+  }
+
+  const monthly_fee = Number(feeText);
+
+  if (!Number.isFinite(monthly_fee) || monthly_fee < 0) {
+    setMessage("studentMessage","La cuota debe ser un importe válido igual o mayor a cero.");
+    return;
+  }
+
+  const {data:group,error:groupError} = await db
+    .from("groups")
+    .select("id")
+    .eq("name",groupName)
+    .limit(1)
+    .maybeSingle();
+
+  if (groupError) {
+    setMessage("studentMessage","Error al consultar grupo: " + groupError.message);
+    return;
+  }
+
+  if (!group) {
+    setMessage("studentMessage","El grupo todavía no está configurado en la base de datos.");
+    return;
+  }
+
+  const {error} = await db.from("students").insert({
+    family_id,
+    group_id:group.id,
+    full_name,
+    monthly_fee,
+    fee_effective_from:new Date().toISOString().slice(0,10)
+  });
+
+  if (error) {
+    setMessage("studentMessage","Error: " + error.message);
+    return;
+  }
+
+  document.getElementById("studentName").value = "";
+  document.getElementById("studentFee").value = "";
+  setMessage("studentMessage","Alumno registrado correctamente.");
+  await loadStudents();
 }
-function renderHistory(){
-let id=Number(document.getElementById('histAlumno').value);
-let s=db.students.find(x=>x.id===id);
-if(!s){document.getElementById('histContenido').innerHTML='';return}
-let ts=db.trainings.filter(t=>t.student===id).sort((a,b)=>b.date.localeCompare(a.date));
-let es=db.evaluations.filter(e=>e.student===id).sort((a,b)=>b.date.localeCompare(a.date));
-document.getElementById('histContenido').innerHTML='<h3>'+esc(s.name)+'</h3><h3>Entrenamientos</h3>'+
-(ts.map(t=>`<div class="item"><b>${t.date}</b> · ${t.present?'Asistió':'Faltó'}<br>${t.observations.map(esc).join(' · ')}</div>`).join('')||'<p>Sin entrenamientos.</p>')+
-'<h3>Evaluaciones</h3>'+(es.map(e=>`<div class="item"><b>${e.date}</b><br>${criteria.map((c,i)=>c+': '+e.values[i]+'/5').join(' · ')}<br>${esc(e.comment||'')}</div>`).join('')||'<p>Sin evaluaciones.</p>');
+
+async function loadStudents() {
+  if (!db) return;
+
+  const list = document.getElementById("studentsList");
+
+  const {data,error} = await db.from("students")
+    .select("id,full_name,monthly_fee,status,families(family_name),groups(name)")
+    .order("full_name");
+
+  if (error) {
+    list.innerHTML = '<div class="empty">No se pudieron cargar los alumnos.</div>';
+    return;
+  }
+
+  if (!data.length) {
+    list.innerHTML = '<div class="empty">Todavía no hay alumnos registrados.</div>';
+    return;
+  }
+
+  list.replaceChildren();
+
+  data.forEach(s => {
+    const card = document.createElement("div");
+    card.className = "item";
+
+    const title = document.createElement("strong");
+    title.textContent = s.full_name;
+
+    const detail = document.createElement("small");
+    detail.textContent =
+      (s.families?.family_name || "Familia") + " · " +
+      (s.groups?.name || "Sin grupo") + " · Cuota: $" +
+      Number(s.monthly_fee).toFixed(2) + " MXN";
+
+    const status = document.createElement("span");
+    status.className = "badge";
+    status.textContent = s.status;
+
+    card.append(title,detail,status);
+    list.appendChild(card);
+  });
 }
-function esc(x){return String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-refresh();
-document.getElementById('fechaEntreno').value=today();
-document.getElementById('fechaEval').value=today();
-document.getElementById('mesRanking').value=today().slice(0,7);
+
+async function restoreSession() {
+  if (!configureDatabase()) return;
+
+  const {data} = await db.auth.getSession();
+  if (!data.session) return;
+
+  currentUser = data.session.user;
+
+  const {data:profile,error} = await db.from("profiles")
+    .select("full_name,role,active")
+    .eq("id",currentUser.id)
+    .single();
+
+  if (!error && profile && profile.active) {
+    currentProfile = profile;
+    showApp();
+  } else {
+    await db.auth.signOut();
+  }
+}
+
+restoreSession();
 </script>
 </body>
-</html>
+  </html>
